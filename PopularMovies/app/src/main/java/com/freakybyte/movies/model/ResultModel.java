@@ -1,20 +1,29 @@
 package com.freakybyte.movies.model;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by Jose Torres on 20/10/2016.
  */
 
-public class ResultModel {
+public class ResultModel implements Parcelable, Cloneable {
+    public static final String TAG = "ResultModel";
+
+    public static final Creator<ResultModel> CREATOR = new Creator<ResultModel>() {
+        public ResultModel createFromParcel(Parcel in) {
+            return new ResultModel(in);
+        }
+
+        public ResultModel[] newArray(int size) {
+            return new ResultModel[size];
+        }
+    };
 
     @JsonProperty("poster_path")
     private String posterPath;
@@ -25,7 +34,7 @@ public class ResultModel {
     @JsonProperty("release_date")
     private String releaseDate;
     @JsonProperty("genre_ids")
-    private List<Integer> genreIds = new ArrayList<Integer>();
+    private ArrayList<Integer> genreIds = new ArrayList<>();
     @JsonProperty("id")
     private Integer id;
     @JsonProperty("original_title")
@@ -44,8 +53,51 @@ public class ResultModel {
     private Boolean video;
     @JsonProperty("vote_average")
     private Double voteAverage;
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+
+    public ResultModel() {
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public ResultModel(Parcel in) {
+        posterPath = in.readString();
+        adult = in.readByte() != 0;
+        overview = in.readString();
+        releaseDate = in.readString();
+        genreIds = new ArrayList<>();
+        genreIds = in.readArrayList(Integer.class.getClassLoader());
+        id = in.readInt();
+        originalTitle = in.readString();
+        originalLanguage = in.readString();
+        title = in.readString();
+        backdropPath = in.readString();
+        popularity = in.readDouble();
+        voteCount = in.readInt();
+        video = in.readByte() != 0;
+        voteAverage = in.readDouble();
+
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(posterPath);
+        dest.writeByte((byte) (adult ? 1 : 0));
+        dest.writeString(overview);
+        dest.writeString(releaseDate);
+        dest.writeList(genreIds);
+        dest.writeInt(id);
+        dest.writeString(originalTitle);
+        dest.writeString(originalLanguage);
+        dest.writeString(title);
+        dest.writeString(backdropPath);
+        dest.writeDouble(popularity);
+        dest.writeInt(voteCount);
+        dest.writeByte((byte) (video ? 1 : 0));
+        dest.writeDouble(voteAverage);
+    }
 
     /**
      * @return The posterPath
@@ -115,7 +167,7 @@ public class ResultModel {
      * @return The genreIds
      */
     @JsonProperty("genre_ids")
-    public List<Integer> getGenreIds() {
+    public ArrayList<Integer> getGenreIds() {
         return genreIds;
     }
 
@@ -123,7 +175,7 @@ public class ResultModel {
      * @param genreIds The genre_ids
      */
     @JsonProperty("genre_ids")
-    public void setGenreIds(List<Integer> genreIds) {
+    public void setGenreIds(ArrayList<Integer> genreIds) {
         this.genreIds = genreIds;
     }
 
@@ -271,14 +323,5 @@ public class ResultModel {
         this.voteAverage = voteAverage;
     }
 
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-    }
 
 }

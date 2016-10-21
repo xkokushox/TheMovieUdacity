@@ -18,13 +18,15 @@ import java.util.List;
  */
 
 public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesItemHolder> {
-    private List<ResultModel> aGallery;
+    private ArrayList<ResultModel> aGallery;
     private RecyclerViewListener mListener;
     private boolean sendLastItemVisible;
+    private int iListIndex;
 
     public MoviesRecyclerViewAdapter(RecyclerViewListener mListener) {
         this.aGallery = new ArrayList<>();
         this.mListener = mListener;
+        iListIndex = 0;
     }
 
     @Override
@@ -51,6 +53,8 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesItemHo
             sendLastItemVisible = false;
             mListener.onLastItemVisible();
         }
+
+        iListIndex = position;
     }
 
     @Override
@@ -58,13 +62,21 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesItemHo
         return this.aGallery.size();
     }
 
-    public void clearItems(List<ResultModel> aImages) {
+    public void clearItems(ArrayList<ResultModel> aImages) {
         sendLastItemVisible = true;
         aGallery.clear();
         swapItems(aImages);
     }
 
-    public void swapItems(List<ResultModel> aImages) {
+    public ArrayList<ResultModel> getMovieList() {
+        return aGallery;
+    }
+
+    public int getListIndex() {
+        return iListIndex;
+    }
+
+    public void swapItems(ArrayList<ResultModel> aImages) {
         sendLastItemVisible = true;
         aGallery.addAll(aImages);
         DebugUtils.logDebug("TotalItems:: ", aGallery.size());

@@ -2,32 +2,65 @@
 
 package com.freakybyte.movies.model;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by Jose Torres on 20/10/2016.
  */
 
-public class MoviesResponse {
+public class MoviesResponse implements Parcelable, Cloneable {
+    public static final String TAG = "MoviesResponse";
+
+    public static final Creator<MoviesResponse> CREATOR = new Creator<MoviesResponse>() {
+        public MoviesResponse createFromParcel(Parcel in) {
+            return new MoviesResponse(in);
+        }
+
+        public MoviesResponse[] newArray(int size) {
+            return new MoviesResponse[size];
+        }
+    };
 
     @JsonProperty("page")
     private Integer page;
     @JsonProperty("results")
-    private List<ResultModel> results = new ArrayList<>();
+    private ArrayList<ResultModel> results = new ArrayList<>();
     @JsonProperty("total_results")
     private Integer totalResults;
     @JsonProperty("total_pages")
     private Integer totalPages;
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<>();
+
+    public MoviesResponse() {
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public MoviesResponse(Parcel in) {
+        page = in.readInt();
+        totalResults = in.readInt();
+        totalPages = in.readInt();
+
+        results = new ArrayList<>();
+        results = in.readArrayList(ResultModel.class.getClassLoader());
+
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(page);
+        dest.writeInt(totalResults);
+        dest.writeInt(totalPages);
+        dest.writeList(results);
+    }
 
     /**
      * @return The page
@@ -49,7 +82,7 @@ public class MoviesResponse {
      * @return The results
      */
     @JsonProperty("results")
-    public List<ResultModel> getResults() {
+    public ArrayList<ResultModel> getResults() {
         return results;
     }
 
@@ -57,7 +90,7 @@ public class MoviesResponse {
      * @param results The results
      */
     @JsonProperty("results")
-    public void setResults(List<ResultModel> results) {
+    public void setResults(ArrayList<ResultModel> results) {
         this.results = results;
     }
 
@@ -91,16 +124,6 @@ public class MoviesResponse {
     @JsonProperty("total_pages")
     public void setTotalPages(Integer totalPages) {
         this.totalPages = totalPages;
-    }
-
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
     }
 
 }

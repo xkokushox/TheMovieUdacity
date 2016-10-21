@@ -15,12 +15,15 @@ import com.freakybyte.movies.control.movies.impl.GridMoviesPresenterImpl;
 import com.freakybyte.movies.listener.RecyclerViewListener;
 import com.freakybyte.movies.model.ResultModel;
 
-import java.util.List;
+import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class GridMoviesActivity extends BaseActivity implements GridMoviesView, RecyclerViewListener, SwipeRefreshLayout.OnRefreshListener {
+
+    public static final String TAG_MOVIE_PAGE = "";
+    public static final String TAG_LIST_INDEX = "";
 
     @BindView(R.id.toolbar)
     public Toolbar toolbar;
@@ -34,6 +37,7 @@ public class GridMoviesActivity extends BaseActivity implements GridMoviesView, 
     private GridMoviesPresenter mPresenter;
 
     private int iMoviePage = 1;
+    private int iListIndex = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +54,16 @@ public class GridMoviesActivity extends BaseActivity implements GridMoviesView, 
         swipeContainer.setOnRefreshListener(this);
         swipeContainer.setColorScheme(new int[]{android.R.color.holo_blue_bright, android.R.color.holo_green_light, android.R.color.holo_orange_light, android.R.color.holo_red_light});
 
-        mPresenter.getPopularMovies(iMoviePage);
+        if (savedInstanceState != null) {
+            iMoviePage = savedInstanceState.getInt(TAG_MOVIE_PAGE, 0);
+            iListIndex = savedInstanceState.getInt(TAG_LIST_INDEX, 0);
+            ArrayList<ResultModel> savedList = savedInstanceState.getParcelableArrayList(ResultModel.TAG);
+            updateGridMovies(savedList);
+        } else {
+            mPresenter.getPopularMovies(iMoviePage);
+        }
+
+
     }
 
     @Override
@@ -71,13 +84,14 @@ public class GridMoviesActivity extends BaseActivity implements GridMoviesView, 
     }
 
     @Override
-    public void updateGridMovies(List<ResultModel> aGallery) {
+    public void updateGridMovies(ArrayList<ResultModel> aGallery) {
         if (iMoviePage == 1)
             mAdapter.clearItems(aGallery);
         else
             mAdapter.swapItems(aGallery);
 
-
+        if (iListIndex != 0)
+            gridImages.scrollToPosition(iListIndex);
     }
 
     @Override
@@ -108,6 +122,14 @@ public class GridMoviesActivity extends BaseActivity implements GridMoviesView, 
             mAdapter = new MoviesRecyclerViewAdapter(this);
 
         return mAdapter;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        savedInstanceState.putParcelableArrayList(ResultModel.TAG, mAdapter.getMovieList());
+        savedInstanceState.putInt(TAG_MOVIE_PAGE, iMoviePage);
+        savedInstanceState.putInt(TAG_LIST_INDEX, mAdapter.getListIndex());
+        super.onSaveInstanceState(savedInstanceState);
     }
 
     @Override

@@ -2,7 +2,7 @@ package com.freakybyte.movies.control.movies.constructor;
 
 import com.freakybyte.movies.model.ResultModel;
 
-import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Created by Jose Torres on 20/10/2016.
@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface GridMoviesView {
 
-    void updateGridMovies(List<ResultModel> aGallery);
+    void updateGridMovies(ArrayList<ResultModel> aGallery);
 
     void showLoader();
 
