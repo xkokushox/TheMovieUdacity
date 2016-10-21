@@ -253,3 +253,5 @@ build
 captures
 node_modules
 *.log
+
+credentials.xml
