@@ -5,6 +5,9 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
 import com.freakybyte.movies.R;
 import com.freakybyte.movies.control.BaseActivity;
@@ -14,6 +17,7 @@ import com.freakybyte.movies.control.movies.constructor.GridMoviesView;
 import com.freakybyte.movies.control.movies.impl.GridMoviesPresenterImpl;
 import com.freakybyte.movies.listener.RecyclerViewListener;
 import com.freakybyte.movies.model.ResultModel;
+import com.freakybyte.movies.util.ConstantUtils;
 
 import java.util.ArrayList;
 
@@ -60,10 +64,40 @@ public class GridMoviesActivity extends BaseActivity implements GridMoviesView, 
             ArrayList<ResultModel> savedList = savedInstanceState.getParcelableArrayList(ResultModel.TAG);
             updateGridMovies(savedList);
         } else {
-            mPresenter.getPopularMovies(iMoviePage);
+            mPresenter.getMovies(iMoviePage);
         }
 
+    }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_item_filter_new:
+                mPresenter.setFilterType(ConstantUtils.movieFilter.NEW);
+                onRefresh();
+                return true;
+            case R.id.menu_item_filter_popular:
+                mPresenter.setFilterType(ConstantUtils.movieFilter.POPULAR);
+                onRefresh();
+                return true;
+            case R.id.menu_item_filter_top_rated:
+                mPresenter.setFilterType(ConstantUtils.movieFilter.TOP_RATED);
+                onRefresh();
+                return true;
+            case R.id.menu_item_filter_upcoming:
+                mPresenter.setFilterType(ConstantUtils.movieFilter.UPCOMING);
+                onRefresh();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override
@@ -74,7 +108,7 @@ public class GridMoviesActivity extends BaseActivity implements GridMoviesView, 
     @Override
     public void onLastItemVisible() {
         iMoviePage++;
-        mPresenter.getPopularMovies(iMoviePage);
+        mPresenter.getMovies(iMoviePage);
     }
 
     @Override
@@ -92,6 +126,8 @@ public class GridMoviesActivity extends BaseActivity implements GridMoviesView, 
 
         if (iListIndex != 0)
             gridImages.scrollToPosition(iListIndex);
+
+        iListIndex = 0;
     }
 
     @Override

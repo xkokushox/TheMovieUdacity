@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/file"
+        android:title="@string/menu_filter"
+        app:showAsAction="never">
+        <menu>
+            <item
+                android:id="@+id/menu_item_filter_new"
+                android:title="@string/menu_item_new"/>
+            <item
+                android:id="@+id/menu_item_filter_upcoming"
+                android:title="@string/menu_item_upcoming"/>
+            <item
+                android:id="@+id/menu_item_filter_popular"
+                android:title="@string/menu_item_popular"/>
+            <item
+                android:id="@+id/menu_item_filter_top_rated"
+                android:title="@string/menu_item_top_rated"/>
+        </menu>
+    </item>
+</menu>

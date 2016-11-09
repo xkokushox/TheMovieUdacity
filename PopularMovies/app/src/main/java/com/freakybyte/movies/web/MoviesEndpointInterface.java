@@ -16,4 +16,14 @@ public interface MoviesEndpointInterface {
 
     @GET("popular?")
     Call<MoviesResponse> getMostPopularMovies(@QueryMap Map<String, String> options);
+
+    @GET("now_playing?")
+    Call<MoviesResponse> getNewPlayingMovies(@QueryMap Map<String, String> options);
+
+    @GET("top_rated?")
+    Call<MoviesResponse> getTopRatedMovies(@QueryMap Map<String, String> options);
+
+    @GET("upcoming?")
+    Call<MoviesResponse> getUpcomingMovies(@QueryMap Map<String, String> options);
+
 }

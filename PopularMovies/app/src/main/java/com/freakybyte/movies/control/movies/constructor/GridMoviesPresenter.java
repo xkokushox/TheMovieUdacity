@@ -1,14 +1,16 @@
 package com.freakybyte.movies.control.movies.constructor;
 
+import com.freakybyte.movies.util.ConstantUtils;
+
 /**
  * Created by Jose Torres on 20/10/2016.
  */
 
 public interface GridMoviesPresenter {
 
-    void getMostRecentMovies();
+    void getMovies(int page);
 
-    void getPopularMovies(int page);
+    void setFilterType(ConstantUtils.movieFilter filter);
 
     void onDestroy();
 

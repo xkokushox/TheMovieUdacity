@@ -6,6 +6,7 @@ import com.freakybyte.movies.R;
 import com.freakybyte.movies.control.movies.constructor.GridMoviesPresenter;
 import com.freakybyte.movies.control.movies.constructor.GridMoviesView;
 import com.freakybyte.movies.model.MoviesResponse;
+import com.freakybyte.movies.util.ConstantUtils;
 import com.freakybyte.movies.util.DebugUtils;
 import com.freakybyte.movies.web.MoviesEndpointInterface;
 import com.freakybyte.movies.web.RetrofitBuilder;
@@ -28,19 +29,16 @@ public class GridMoviesPresenterImpl implements GridMoviesPresenter {
     private FragmentActivity mActivity;
 
     private Call<MoviesResponse> callWebService;
+    private ConstantUtils.movieFilter mMovieFilter;
 
     public GridMoviesPresenterImpl(FragmentActivity activity, GridMoviesView view) {
         mView = view;
         mActivity = activity;
+        mMovieFilter = ConstantUtils.movieFilter.POPULAR;
     }
 
     @Override
-    public void getMostRecentMovies() {
-
-    }
-
-    @Override
-    public void getPopularMovies(int page) {
+    public void getMovies(int page) {
         DebugUtils.logDebug(TAG, "GetItemsFromServer: Start  Page:: " + page);
         mView.showLoader();
 
@@ -49,7 +47,20 @@ public class GridMoviesPresenterImpl implements GridMoviesPresenter {
         Map<String, String> mapMovies = new HashMap<>();
         mapMovies.put("api_key", mActivity.getString(R.string.the_movie_db_api_key));
         mapMovies.put("page", String.valueOf(page));
-        callWebService = apiService.getMostPopularMovies(mapMovies);
+        switch (mMovieFilter) {
+            case NEW:
+                callWebService = apiService.getNewPlayingMovies(mapMovies);
+                break;
+            case POPULAR:
+                callWebService = apiService.getMostPopularMovies(mapMovies);
+                break;
+            case TOP_RATED:
+                callWebService = apiService.getTopRatedMovies(mapMovies);
+                break;
+            case UPCOMING:
+                callWebService = apiService.getUpcomingMovies(mapMovies);
+                break;
+        }
         callWebService.enqueue(new Callback<MoviesResponse>() {
             @Override
             public void onResponse(Call<MoviesResponse> call, Response<MoviesResponse> response) {
@@ -77,6 +88,11 @@ public class GridMoviesPresenterImpl implements GridMoviesPresenter {
             }
 
         });
+    }
+
+    @Override
+    public void setFilterType(ConstantUtils.movieFilter filter) {
+        this.mMovieFilter = filter;
     }
 
     @Override

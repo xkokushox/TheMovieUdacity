@@ -3,4 +3,10 @@
 
     <string name="url_base">http://api.themoviedb.org/3/movie/</string>
 
+    <string name="menu_filter">Filter</string>
+    <string name="menu_item_new">Now Playing</string>
+    <string name="menu_item_upcoming">Upcoming</string>
+    <string name="menu_item_popular">Popular</string>
+    <string name="menu_item_top_rated">Top Rated</string>
+
 </resources>

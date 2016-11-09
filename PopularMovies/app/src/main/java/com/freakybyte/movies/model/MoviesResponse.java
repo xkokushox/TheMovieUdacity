@@ -1,19 +1,18 @@
-
-
 package com.freakybyte.movies.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Jose Torres on 20/10/2016.
  */
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class MoviesResponse implements Parcelable, Cloneable {
     public static final String TAG = "MoviesResponse";
 
