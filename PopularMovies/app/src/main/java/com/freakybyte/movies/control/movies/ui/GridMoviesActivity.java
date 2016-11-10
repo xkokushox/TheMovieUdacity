@@ -18,16 +18,22 @@ import com.freakybyte.movies.control.movies.impl.GridMoviesPresenterImpl;
 import com.freakybyte.movies.listener.RecyclerViewListener;
 import com.freakybyte.movies.model.ResultModel;
 import com.freakybyte.movies.util.ConstantUtils;
+import com.freakybyte.movies.util.DebugUtils;
 
 import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class GridMoviesActivity extends BaseActivity implements GridMoviesView, RecyclerViewListener, SwipeRefreshLayout.OnRefreshListener {
 
-    public static final String TAG_MOVIE_PAGE = "";
-    public static final String TAG_LIST_INDEX = "";
+    public static final String TAG = "GridMoviesActivity";
+
+    public static final String TAG_MOVIE_PAGE = "MoviePage";
+    public static final String TAG_LIST_INDEX = "ListIndex";
+    public static final String TAG_FILTER_TYPE = "FilterType";
+    public static final String TAG_SUBTITLE = "Subtitle";
 
     @BindView(R.id.toolbar)
     public Toolbar toolbar;
@@ -42,6 +48,7 @@ public class GridMoviesActivity extends BaseActivity implements GridMoviesView, 
 
     private int iMoviePage = 1;
     private int iListIndex = 0;
+    private String mSubtitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +56,8 @@ public class GridMoviesActivity extends BaseActivity implements GridMoviesView, 
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle(R.string.activity_title_grid);
+
         mPresenter = new GridMoviesPresenterImpl(this, this);
 
         gridImages.setLayoutManager(getStageGridLayoutManager());
@@ -61,8 +70,10 @@ public class GridMoviesActivity extends BaseActivity implements GridMoviesView, 
         if (savedInstanceState != null) {
             iMoviePage = savedInstanceState.getInt(TAG_MOVIE_PAGE, 0);
             iListIndex = savedInstanceState.getInt(TAG_LIST_INDEX, 0);
+            mSubtitle = savedInstanceState.getString(TAG_SUBTITLE, "");
+            mPresenter.setFilterType((ConstantUtils.movieFilter) savedInstanceState.getSerializable(TAG_FILTER_TYPE));
             ArrayList<ResultModel> savedList = savedInstanceState.getParcelableArrayList(ResultModel.TAG);
-            updateGridMovies(savedList);
+            updateGridMovies(savedList, mSubtitle);
         } else {
             mPresenter.getMovies(iMoviePage);
         }
@@ -100,9 +111,17 @@ public class GridMoviesActivity extends BaseActivity implements GridMoviesView, 
         }
     }
 
+    @OnClick(R.id.toolbar)
+    public void onClickToolbar() {
+        iListIndex = 0;
+        gridImages.smoothScrollToPosition(iListIndex);
+    }
+
     @Override
     public void onItemClick(Object object) {
-
+        ResultModel movie = (ResultModel) object;
+        mPresenter.getMovieDetail(movie.getId());
+        DebugUtils.logDebug(TAG, "Movie Selected:: " + movie.getTitle() + " Id:: " + movie.getId());
     }
 
     @Override
@@ -118,7 +137,10 @@ public class GridMoviesActivity extends BaseActivity implements GridMoviesView, 
     }
 
     @Override
-    public void updateGridMovies(ArrayList<ResultModel> aGallery) {
+    public void updateGridMovies(ArrayList<ResultModel> aGallery, String subtitle) {
+        mSubtitle = subtitle;
+        getSupportActionBar().setSubtitle(subtitle);
+
         if (iMoviePage == 1)
             mAdapter.clearItems(aGallery);
         else
@@ -146,25 +168,13 @@ public class GridMoviesActivity extends BaseActivity implements GridMoviesView, 
 
     }
 
-    private StaggeredGridLayoutManager getStageGridLayoutManager() {
-        if (stageGridLayoutManager == null)
-            stageGridLayoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
-
-        return stageGridLayoutManager;
-    }
-
-    private MoviesRecyclerViewAdapter getMoviesAdapter() {
-        if (mAdapter == null)
-            mAdapter = new MoviesRecyclerViewAdapter(this);
-
-        return mAdapter;
-    }
-
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
         savedInstanceState.putParcelableArrayList(ResultModel.TAG, mAdapter.getMovieList());
         savedInstanceState.putInt(TAG_MOVIE_PAGE, iMoviePage);
         savedInstanceState.putInt(TAG_LIST_INDEX, mAdapter.getListIndex());
+        savedInstanceState.putString(TAG_SUBTITLE, mSubtitle);
+        savedInstanceState.putSerializable(TAG_FILTER_TYPE, mPresenter.getFilterType());
         super.onSaveInstanceState(savedInstanceState);
     }
 
@@ -181,5 +191,19 @@ public class GridMoviesActivity extends BaseActivity implements GridMoviesView, 
     protected void onDestroy() {
         super.onDestroy();
         mPresenter.onDestroy();
+    }
+
+    private StaggeredGridLayoutManager getStageGridLayoutManager() {
+        if (stageGridLayoutManager == null)
+            stageGridLayoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
+
+        return stageGridLayoutManager;
+    }
+
+    private MoviesRecyclerViewAdapter getMoviesAdapter() {
+        if (mAdapter == null)
+            mAdapter = new MoviesRecyclerViewAdapter(this);
+
+        return mAdapter;
     }
 }

@@ -1,12 +1,16 @@
 <resources>
     <string name="app_name">PopularMovies</string>
 
-    <string name="url_base">http://api.themoviedb.org/3/movie/</string>
+    <string name="activity_title_grid">Popular Movies Udacity</string>
 
+    <!--Menu-->
     <string name="menu_filter">Filter</string>
     <string name="menu_item_new">Now Playing</string>
     <string name="menu_item_upcoming">Upcoming</string>
     <string name="menu_item_popular">Popular</string>
     <string name="menu_item_top_rated">Top Rated</string>
+
+    <!--Url-->
+    <string name="url_base">http://api.themoviedb.org/3/movie/</string>
 
 </resources>

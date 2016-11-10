@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 public interface GridMoviesView {
 
-    void updateGridMovies(ArrayList<ResultModel> aGallery);
+    void updateGridMovies(ArrayList<ResultModel> aGallery, String subtitle);
 
     void showLoader();
 

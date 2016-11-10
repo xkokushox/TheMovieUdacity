@@ -12,6 +12,10 @@ public interface GridMoviesPresenter {
 
     void setFilterType(ConstantUtils.movieFilter filter);
 
+    ConstantUtils.movieFilter getFilterType();
+
+    void getMovieDetail(int id);
+
     void onDestroy();
 
     void cancelDownload();
