@@ -10,4 +10,7 @@
 
     <color name="colorFAB">#F57C00</color>
 
+    <color name="white">#FFFFFF</color>
+    <color name="transparent">#00000000</color>
+
 </resources>

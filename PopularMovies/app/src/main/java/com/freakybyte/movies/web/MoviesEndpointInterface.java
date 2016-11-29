@@ -2,6 +2,7 @@ package com.freakybyte.movies.web;
 
 import com.freakybyte.movies.model.MoviesResponse;
 import com.freakybyte.movies.model.movie.MovieResponseModel;
+import com.freakybyte.movies.model.review.ReviewMovieResult;
 
 import java.util.Map;
 
@@ -30,5 +31,8 @@ public interface MoviesEndpointInterface {
 
     @GET("{id}?")
     Call<MovieResponseModel> getMovieDetail(@Path("id") int groupId, @QueryMap Map<String, String> options);
+
+    @GET("{movie_id}/reviews?")
+    Call<ReviewMovieResult> getMovieReviews(@Path("movie_id") int movieId, @QueryMap Map<String, String> options);
 
 }

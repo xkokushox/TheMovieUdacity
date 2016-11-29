@@ -59,7 +59,7 @@ public class MovieResponseModel implements Parcelable {
     @JsonProperty("video")
     private Boolean video;
     @JsonProperty("vote_average")
-    private Integer voteAverage;
+    private float voteAverage;
     @JsonProperty("vote_count")
     private Integer voteCount;
 
@@ -419,7 +419,7 @@ public class MovieResponseModel implements Parcelable {
      * @return The voteAverage
      */
     @JsonProperty("vote_average")
-    public Integer getVoteAverage() {
+    public float getVoteAverage() {
         return voteAverage;
     }
 
@@ -427,7 +427,7 @@ public class MovieResponseModel implements Parcelable {
      * @param voteAverage The vote_average
      */
     @JsonProperty("vote_average")
-    public void setVoteAverage(Integer voteAverage) {
+    public void setVoteAverage(float voteAverage) {
         this.voteAverage = voteAverage;
     }
 
@@ -507,7 +507,7 @@ public class MovieResponseModel implements Parcelable {
         this.tagline = in.readString();
         this.title = in.readString();
         this.video = (Boolean) in.readValue(Boolean.class.getClassLoader());
-        this.voteAverage = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.voteAverage = (float) in.readValue(Float.class.getClassLoader());
         this.voteCount = (Integer) in.readValue(Integer.class.getClassLoader());
     }
 

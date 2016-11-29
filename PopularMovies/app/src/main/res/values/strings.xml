@@ -13,4 +13,7 @@
     <!--Url-->
     <string name="url_base">http://api.themoviedb.org/3/movie/</string>
 
+    <string name="detail_movie_duration">%d min</string>
+    <string name="detail_movie_rating">%.1f/10</string>
+
 </resources>

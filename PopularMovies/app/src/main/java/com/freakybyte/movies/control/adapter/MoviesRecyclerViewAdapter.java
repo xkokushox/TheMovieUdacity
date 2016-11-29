@@ -1,14 +1,29 @@
 package com.freakybyte.movies.control.adapter;
 
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.net.Uri;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.drawee.backends.pipeline.PipelineDraweeController;
+import com.facebook.drawee.controller.BaseControllerListener;
+import com.facebook.drawee.controller.ControllerListener;
+import com.facebook.imagepipeline.image.ImageInfo;
+import com.facebook.imagepipeline.request.BasePostprocessor;
+import com.facebook.imagepipeline.request.ImageRequest;
+import com.facebook.imagepipeline.request.ImageRequestBuilder;
+import com.facebook.imagepipeline.request.Postprocessor;
+import com.freakybyte.movies.MoviesApplication;
 import com.freakybyte.movies.R;
 import com.freakybyte.movies.listener.RecyclerViewListener;
 import com.freakybyte.movies.model.ResultModel;
 import com.freakybyte.movies.util.DebugUtils;
+import com.freakybyte.movies.util.ImageUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +55,11 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesItemHo
     public void onBindViewHolder(final MoviesItemHolder viewHolder, int position) {
         final ResultModel mImage = aGallery.get(position);
 
+        viewHolder.getTvMovieTitle().setText(mImage.getOriginalTitle());
+
+        viewHolder.getWrapperMovieResume().setBackgroundColor(MoviesApplication.getInstance().getResources().getColor(R.color.white));
+        viewHolder.getTvMovieTitle().setTextColor(MoviesApplication.getInstance().getResources().getColor(R.color.primaryText));
+
         viewHolder.getView().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -47,12 +67,45 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesItemHo
             }
         });
 
-        viewHolder.getImagePoster().setImageURI("https://image.tmdb.org/t/p/w500/" + mImage.getPosterPath());
+        final Postprocessor redMeshPostprocessor = new BasePostprocessor() {
+
+            @Override
+            public void process(Bitmap bitmap) {
+                Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
+                    @SuppressWarnings("ResourceType")
+                    @Override
+                    public void onGenerated(Palette palette) {
+                        if (palette != null) {
+                            Palette.Swatch dominantSwatch = palette.getDominantSwatch();
+                            if (dominantSwatch != null) {
+                                viewHolder.getWrapperMovieResume().setBackgroundColor(dominantSwatch.getRgb());
+                                viewHolder.getTvMovieTitle().setTextColor(dominantSwatch.getTitleTextColor());
+                            }
+                        }
+                    }
+                });
+            }
+        };
+
+        final ImageRequest request = ImageRequestBuilder.newBuilderWithSource(Uri.parse(ImageUtils.getMovieUri(true, mImage.getPosterPath())))
+                .setPostprocessor(redMeshPostprocessor)
+                .build();
+
+        final PipelineDraweeController controller = (PipelineDraweeController)
+                Fresco.newDraweeControllerBuilder()
+                        .setImageRequest(request)
+                        .setOldController(viewHolder.getImagePoster().getController())
+                        .build();
+
+        viewHolder.getImagePoster().setController(controller);
 
         if (position == aGallery.size() - 1 && sendLastItemVisible) {
             sendLastItemVisible = false;
             mListener.onLastItemVisible();
         }
+
+        if (mImage.getVideo())
+            DebugUtils.logDebug("Has Vieos:: " + mImage.getId());
 
         iListIndex = position;
     }

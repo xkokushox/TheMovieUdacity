@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
 
 import com.freakybyte.movies.R;
-import com.freakybyte.movies.control.movie.MovieDetailActivity;
+import com.freakybyte.movies.control.movie.ui.MovieDetailActivity;
 import com.freakybyte.movies.control.movies.constructor.GridMoviesPresenter;
 import com.freakybyte.movies.control.movies.constructor.GridMoviesView;
 import com.freakybyte.movies.model.MoviesResponse;
@@ -52,6 +52,7 @@ public class GridMoviesPresenterImpl implements GridMoviesPresenter {
         Map<String, String> mapMovies = new HashMap<>();
         mapMovies.put("api_key", mActivity.getString(R.string.the_movie_db_api_key));
         mapMovies.put("page", String.valueOf(page));
+        mapMovies.put("language", "en-US");
         switch (mMovieFilter) {
             case NEW:
                 callWebService = apiService.getNewPlayingMovies(mapMovies);
@@ -123,7 +124,7 @@ public class GridMoviesPresenterImpl implements GridMoviesPresenter {
 
         Map<String, String> mapMovies = new HashMap<>();
         mapMovies.put("api_key", mActivity.getString(R.string.the_movie_db_api_key));
-        mapMovies.put("language", "es-mx");
+        mapMovies.put("language", "en-US");
         callWebService = apiService.getMovieDetail(id, mapMovies);
 
         callWebService.enqueue(new Callback<MovieResponseModel>() {
@@ -133,7 +134,6 @@ public class GridMoviesPresenterImpl implements GridMoviesPresenter {
                     switch (response.code()) {
                         case 200:
                             MovieResponseModel aMovies = response.body();
-                            DebugUtils.logDebug(TAG, "getMovieDetail: Movie:: " + aMovies.getTitle());
                             Intent iMovieDetail = new Intent(mActivity, MovieDetailActivity.class);
                             iMovieDetail.putExtra(MovieResponseModel.TAG, aMovies);
                             mActivity.startActivity(iMovieDetail);
