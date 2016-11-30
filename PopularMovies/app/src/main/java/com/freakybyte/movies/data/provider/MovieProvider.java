@@ -9,27 +9,26 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 
 import com.freakybyte.movies.data.DBAdapter;
-import com.freakybyte.movies.data.MovieDbHelper;
-import com.freakybyte.movies.data.dao.FavoriteDao;
-import com.freakybyte.movies.data.dao.MovieDao;
 import com.freakybyte.movies.data.tables.FavoriteEntry;
 import com.freakybyte.movies.data.tables.MovieContract;
 import com.freakybyte.movies.data.tables.MovieEntry;
+import com.freakybyte.movies.util.DebugUtils;
 
 /**
  * Created by Jose Torres on 29/11/2016.
  */
 
 public class MovieProvider extends ContentProvider {
+    public static final String TAG = "MovieProvider";
 
     // The URI Matcher used by this content provider.
     private static final UriMatcher sUriMatcher = buildUriMatcher();
-    private MovieDbHelper mOpenHelper;
 
 
     public static final int MOVIES = 69;
     public static final int MOVIE_ID = 70;
     public static final int FAVORITES = 71;
+    public static final int FAVORITE_ID = 72;
 
     private static final SQLiteQueryBuilder sWeatherByLocationSettingQueryBuilder;
 
@@ -53,13 +52,13 @@ public class MovieProvider extends ContentProvider {
         uriMatcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_MOVIE, MOVIES);
         uriMatcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_MOVIE + "/#", MOVIE_ID);
         uriMatcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_FAVORITE, FAVORITES);
+        uriMatcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_FAVORITE + "/#", FAVORITE_ID);
 
         return uriMatcher;
     }
 
     @Override
     public boolean onCreate() {
-        mOpenHelper = new MovieDbHelper(getContext());
         return true;
     }
 
@@ -70,6 +69,8 @@ public class MovieProvider extends ContentProvider {
         switch (match) {
             case FAVORITES:
                 return FavoriteEntry.CONTENT_TYPE;
+            case FAVORITE_ID:
+                return FavoriteEntry.CONTENT_ITEM_TYPE;
             case MOVIES:
                 return MovieEntry.CONTENT_TYPE;
             case MOVIE_ID:
@@ -84,41 +85,43 @@ public class MovieProvider extends ContentProvider {
                         String sortOrder) {
 
         Cursor retCursor;
+        SQLiteQueryBuilder queryBuilder;
+
         switch (sUriMatcher.match(uri)) {
             case MOVIES:
-                retCursor = mOpenHelper.getReadableDatabase().query(
-                        MovieEntry.TABLE_NAME,
+                retCursor = DBAdapter.getInstance(getContext()).query(MovieEntry.TABLE_NAME,
                         projection,
                         selection,
                         selectionArgs,
-                        null,
-                        null, sortOrder
-                );
+                        sortOrder);
                 break;
             case MOVIE_ID:
-                SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
+                queryBuilder = new SQLiteQueryBuilder();
                 queryBuilder.setTables(MovieEntry.TABLE_NAME);
-                queryBuilder.appendWhere(MovieEntry.COLUMN_MOVIE_ID + "="
-                        + uri.getLastPathSegment());
-                retCursor = queryBuilder.query(mOpenHelper.getReadableDatabase(),
+                queryBuilder.appendWhere(MovieEntry.COLUMN_MOVIE_ID + "=" + uri.getLastPathSegment());
+                retCursor = DBAdapter.getInstance(getContext()).query(queryBuilder,
                         projection,
                         selection,
                         selectionArgs,
-                        null,
-                        null, sortOrder
-                );
+                        sortOrder);
                 break;
             case FAVORITES:
-                retCursor = sWeatherByLocationSettingQueryBuilder.query(mOpenHelper.getReadableDatabase(),
+                retCursor = DBAdapter.getInstance(getContext()).query(sWeatherByLocationSettingQueryBuilder,
                         projection,
-                        null,
-                        null,
-                        null,
-                        null,
-                        sortOrder
-                );
+                        selection,
+                        selectionArgs,
+                        sortOrder);
                 break;
-
+            case FAVORITE_ID:
+                queryBuilder = new SQLiteQueryBuilder();
+                queryBuilder.setTables(FavoriteEntry.TABLE_NAME);
+                queryBuilder.appendWhere(FavoriteEntry.COLUMN_MOVIE_KEY + "=" + uri.getLastPathSegment());
+                retCursor = DBAdapter.getInstance(getContext()).query(queryBuilder,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        sortOrder);
+                break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -136,7 +139,7 @@ public class MovieProvider extends ContentProvider {
 
         switch (match) {
             case MOVIES: {
-                long _id = MovieDao.getInstance(getContext()).insertMovie(values);
+                long _id = DBAdapter.getInstance(getContext()).insert(MovieEntry.TABLE_NAME, values);
                 if (_id > 0)
                     returnUri = MovieEntry.buildMovieUri(_id);
                 else
@@ -144,7 +147,7 @@ public class MovieProvider extends ContentProvider {
                 break;
             }
             case FAVORITES:
-                long _id = FavoriteDao.getInstance().insertFavoriteMovie(values);
+                long _id = DBAdapter.getInstance(getContext()).insert(FavoriteEntry.TABLE_NAME, values);
                 if (_id > 0)
                     returnUri = FavoriteEntry.buildFavoriteUri(_id);
                 else
@@ -165,12 +168,17 @@ public class MovieProvider extends ContentProvider {
         // this makes delete all rows return the number of rows deleted
         if (null == selection) selection = "1";
         switch (match) {
-            case MOVIES: {
+            case MOVIE_ID:
                 rowsDeleted = DBAdapter.getInstance(getContext()).delete(MovieEntry.TABLE_NAME, selection, selectionArgs);
                 break;
-            }
-            case FAVORITES:
+            case FAVORITE_ID:
                 rowsDeleted = DBAdapter.getInstance(getContext()).delete(FavoriteEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            case MOVIES:
+                rowsDeleted = DBAdapter.getInstance(getContext()).deleteAll(MovieEntry.TABLE_NAME);
+                break;
+            case FAVORITES:
+                rowsDeleted = DBAdapter.getInstance(getContext()).deleteAll(FavoriteEntry.TABLE_NAME);
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -179,6 +187,7 @@ public class MovieProvider extends ContentProvider {
         if (rowsDeleted != 0) {
             getContext().getContentResolver().notifyChange(uri, null);
         }
+        DebugUtils.logDebug(TAG, "Uri:: " + uri.getPath() + " Records Deleted::" + rowsDeleted);
         return rowsDeleted;
     }
 
@@ -203,6 +212,7 @@ public class MovieProvider extends ContentProvider {
         if (rowsUpdated != 0) {
             getContext().getContentResolver().notifyChange(uri, null);
         }
+        DebugUtils.logDebug(TAG, "Uri:: " + uri.getPath() + " Records Updated::" + rowsUpdated);
         return rowsUpdated;
     }
 
@@ -211,16 +221,7 @@ public class MovieProvider extends ContentProvider {
         final int match = sUriMatcher.match(uri);
         switch (match) {
             case MOVIES:
-                int returnCount = 0;
-                try {
-                    for (ContentValues value : values) {
-                        long _id = DBAdapter.getInstance(getContext()).insert(MovieEntry.TABLE_NAME, null, value);
-                        if (_id != -1) {
-                            returnCount++;
-                        }
-                    }
-                } finally {
-                }
+                int returnCount = DBAdapter.getInstance(getContext()).insertBulk(MovieEntry.TABLE_NAME, null, values);
                 getContext().getContentResolver().notifyChange(uri, null);
                 return returnCount;
             default:
@@ -231,7 +232,6 @@ public class MovieProvider extends ContentProvider {
     @Override
     @TargetApi(11)
     public void shutdown() {
-        mOpenHelper.close();
         super.shutdown();
     }
 

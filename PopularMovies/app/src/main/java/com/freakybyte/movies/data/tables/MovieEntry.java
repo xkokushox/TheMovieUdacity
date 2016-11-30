@@ -39,8 +39,9 @@ public class MovieEntry extends MovieContract implements BaseColumns {
             COLUMN_TITLE + "  TEXT NOT NULL, " +
             COLUMN_BACKDROP_PATH + "  TEXT NOT NULL, " +
             COLUMN_VOTE_AVERAGE + " REAL NOT NULL, " +
-            COLUMN_VOTE_RUNTIME + " INTEGER NOT NULL " +
-            " );";
+            COLUMN_VOTE_RUNTIME + " INTEGER NOT NULL , " +
+
+            " UNIQUE (" + COLUMN_MOVIE_ID + ") ON CONFLICT REPLACE);";
 
 
     public static Uri buildMovieUri(long id) {

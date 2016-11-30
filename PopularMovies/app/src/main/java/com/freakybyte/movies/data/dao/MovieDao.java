@@ -1,9 +1,12 @@
 package com.freakybyte.movies.data.dao;
 
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
+import android.net.Uri;
 
 import com.freakybyte.movies.data.DBAdapter;
+import com.freakybyte.movies.data.tables.FavoriteEntry;
 import com.freakybyte.movies.data.tables.MovieEntry;
 import com.freakybyte.movies.model.movie.MovieResponseModel;
 import com.freakybyte.movies.util.DebugUtils;
@@ -56,12 +59,17 @@ public class MovieDao {
         return testValues;
     }
 
-    public long insertMovie(MovieResponseModel mMovie) {
-        return DBAdapter.getInstance(mContext).insert(MovieEntry.TABLE_NAME, createMovieValue(mMovie));
+    public long insertMovieByContent(ContentValues contentValues) {
+        return ContentUris.parseId(insertContentMovie(contentValues));
     }
 
-    public long insertMovie(ContentValues contentValues) {
-        return DBAdapter.getInstance(mContext).insert(MovieEntry.TABLE_NAME, contentValues);
+    public Uri insertContentMovie(ContentValues contentValues) {
+        return mContext.getContentResolver().insert(MovieEntry.CONTENT_URI, contentValues);
+    }
+
+    public void insertMovieByModel(MovieResponseModel mMovie) {
+        ContentValues contentValue = createMovieValue(mMovie);
+        insertContentMovie(contentValue);
     }
 
     public int insertMovies(ArrayList<MovieResponseModel> aMovies) {
@@ -78,11 +86,21 @@ public class MovieDao {
         return numInserted;
     }
 
-    public static void deleteAll() {
-        mContext.getContentResolver().delete(
+    public static int deleteAll() {
+        return mContext.getContentResolver().delete(
                 MovieEntry.CONTENT_URI,
                 null,
                 null
+        );
+    }
+
+    public static int deleteMovie(int idMovie) {
+        String mSelectionClause = MovieEntry.COLUMN_MOVIE_ID + " = ?";
+        String[] mSelectionArgs = {String.valueOf(idMovie)};
+        return mContext.getContentResolver().delete(
+                MovieEntry.CONTENT_URI,
+                mSelectionClause,
+                mSelectionArgs
         );
     }
 

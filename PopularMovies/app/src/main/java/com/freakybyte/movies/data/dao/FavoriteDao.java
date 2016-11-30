@@ -2,6 +2,7 @@ package com.freakybyte.movies.data.dao;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.net.Uri;
 
 import com.freakybyte.movies.data.DBAdapter;
 import com.freakybyte.movies.data.tables.FavoriteEntry;
@@ -57,6 +58,10 @@ public class FavoriteDao {
         return DBAdapter.getInstance(mContext).insert(FavoriteEntry.TABLE_NAME, contentValues);
     }
 
+    public Uri insertContentFavoriteMovie(ContentValues contentValues) {
+        return mContext.getContentResolver().insert(FavoriteEntry.CONTENT_URI, contentValues);
+    }
+
     public int insertFavoriteMovies(ArrayList<MovieResponseModel> aMovies) {
         MovieDao.getInstance(mContext).insertMovies(aMovies);
         ContentValues[] bulkInsertContentValues = new ContentValues[aMovies.size()];
@@ -64,6 +69,11 @@ public class FavoriteDao {
             bulkInsertContentValues[i] = createFavoriteValues(aMovies.get(i).getId());
 
         return insertBulkMovies(bulkInsertContentValues);
+    }
+
+    public void insertFavoriteMovie(MovieResponseModel mMovie) {
+        MovieDao.getInstance(mContext).insertMovieByModel(mMovie);
+        insertContentFavoriteMovie(createFavoriteValues(mMovie.getId()));
     }
 
     public int insertBulkMovies(ContentValues[] bulkInsertContentValues) {
@@ -77,6 +87,16 @@ public class FavoriteDao {
                 FavoriteEntry.CONTENT_URI,
                 null,
                 null
+        );
+    }
+
+    public static int deleteFavorite(int idMovie) {
+        String mSelectionClause = FavoriteEntry.COLUMN_MOVIE_KEY + " = ?";
+        String[] mSelectionArgs = {String.valueOf(idMovie)};
+        return mContext.getContentResolver().delete(
+                FavoriteEntry.CONTENT_URI,
+                mSelectionClause,
+                mSelectionArgs
         );
     }
 }

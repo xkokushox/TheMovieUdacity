@@ -43,26 +43,69 @@ public class DBAdapter {
         this.mContext = context;
     }
 
-    private DBAdapter open() throws SQLException {
-        mDbHelper = new MovieDbHelper(mContext);
+    public DBAdapter open() throws SQLException {
+        if (mDbHelper == null)
+            mDbHelper = new MovieDbHelper(mContext);
         mDb = mDbHelper.getWritableDatabase();
         return this;
     }
 
-    private void close() {
+    public void close() {
         mDbHelper.close();
     }
 
-    public void begginTransaction() {
+    private void beginTransaction() {
         open();
         mDb.beginTransaction();
     }
 
-    public void setTransactionSuccessful() {
+    private void setTransactionSuccessful() {
         mDb.setTransactionSuccessful();
         mDb.endTransaction();
         close();
     }
+
+    public Cursor getData(String tables) {
+        SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
+        queryBuilder.setTables(tables);
+        Cursor cursor = queryBuilder.query(mDb, null, null, null, null, null,
+                null);
+        return cursor;
+    }
+
+    public Cursor getData(Uri uri) {
+        Cursor cursor = mContext.getContentResolver().query(
+                uri,
+                null,
+                null,
+                null,
+                null
+        );
+        return cursor;
+    }
+
+    public Cursor query(String tableName, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+        return mDbHelper.getReadableDatabase().query(
+                tableName,
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null, sortOrder
+        );
+    }
+
+    public Cursor query(SQLiteQueryBuilder queryBuilder, String[] projection, String selection, String[] selectionArgs,
+                        String sortOrder) {
+        return queryBuilder.query(mDbHelper.getReadableDatabase(),
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null, sortOrder
+        );
+    }
+
 
     /**
      * Insert a new record into the specified table
@@ -99,24 +142,23 @@ public class DBAdapter {
         return isInserted;
     }
 
-    public Cursor getData(String tables) {
-        SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
-        queryBuilder.setTables(tables);
-        Cursor cursor = queryBuilder.query(mDb, null, null, null, null, null,
-                null);
-        return cursor;
+    public int insertBulk(String table, String columnHack, ContentValues[] cValues) {
+        int returnCount = 0;
+        try {
+            beginTransaction();
+            for (ContentValues value : cValues) {
+                long _id = mDb.insert(table, columnHack, value);
+                if (_id != -1) {
+                    returnCount++;
+                }
+            }
+        } finally {
+            setTransactionSuccessful();
+        }
+
+        return returnCount;
     }
 
-    public Cursor getData(Uri uri) {
-        Cursor cursor = mContext.getContentResolver().query(
-                uri,
-                null,
-                null,
-                null,
-                null
-        );
-        return cursor;
-    }
 
     /**
      * Delete an entry from database
@@ -168,12 +210,12 @@ public class DBAdapter {
         int rowsUpdated = 0;
 
         try {
-            begginTransaction();
+            open();
             rowsUpdated = mDb.update(table, cValues, condition, args);
         } catch (Exception e) {
             DebugUtils.logError("DbAdapter.update", e.toString());
         } finally {
-            setTransactionSuccessful();
+            close();
         }
         return rowsUpdated;
     }

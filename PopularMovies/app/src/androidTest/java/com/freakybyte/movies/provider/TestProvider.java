@@ -37,7 +37,7 @@ public class TestProvider extends AndroidTestCase {
     }
 
     public void deleteAllRecords() {
-        deleteAllRecordsFromProvider();
+        actionDeleteRecords();
     }
 
     @Override
@@ -48,7 +48,6 @@ public class TestProvider extends AndroidTestCase {
 
     public void testContentProvider() {
         actionInsertReadProvider();
-        actionDeleteRecords();
         actionBulkMovieInsert();
     }
 
@@ -66,11 +65,15 @@ public class TestProvider extends AndroidTestCase {
         assertEquals("Error: the MovieEntry CONTENT_URI should return MovieEntry.CONTENT_TYPE",
                 MovieEntry.CONTENT_TYPE, type);
 
-        int movieId = 94074;
         type = mContext.getContentResolver().getType(
-                MovieEntry.buildMovieUri(movieId));
+                MovieEntry.buildMovieUri(TestUtilities.TEST_MOVIE_ID));
         assertEquals("Error: the MovieEntry CONTENT_URI with id should return MovieEntry.CONTENT_ITEM_TYPE",
                 MovieEntry.CONTENT_ITEM_TYPE, type);
+
+        type = mContext.getContentResolver().getType(
+                FavoriteEntry.buildFavoriteUri(TestUtilities.TEST_MOVIE_ID));
+        assertEquals("Error: the FavoriteEntry CONTENT_URI with id should return FavoriteEntry.CONTENT_ITEM_TYPE",
+                FavoriteEntry.CONTENT_ITEM_TYPE, type);
 
     }
 
@@ -80,14 +83,14 @@ public class TestProvider extends AndroidTestCase {
 
         TestUtilities.TestContentObserver tco = TestUtilities.getTestContentObserver();
         mContext.getContentResolver().registerContentObserver(MovieEntry.CONTENT_URI, true, tco);
-        Uri locationUri = mContext.getContentResolver().insert(MovieEntry.CONTENT_URI, testValues);
+        Uri movieUri = MovieDao.getInstance(getContext()).insertContentMovie(testValues);
 
         tco.waitForNotificationOrFail();
         mContext.getContentResolver().unregisterContentObserver(tco);
 
-        long locationRowId = ContentUris.parseId(locationUri);
+        long movieRowId = ContentUris.parseId(movieUri);
 
-        assertTrue(locationRowId != -1);
+        assertTrue(movieRowId != -1);
 
         Cursor cursorMovie = DBAdapter.getInstance(getContext()).getData(MovieEntry.CONTENT_URI);
 
@@ -104,7 +107,7 @@ public class TestProvider extends AndroidTestCase {
 
         mContext.getContentResolver().registerContentObserver(FavoriteEntry.CONTENT_URI, true, tco);
 
-        Uri favoriteInsertUri = mContext.getContentResolver().insert(FavoriteEntry.CONTENT_URI, favoriteValues);
+        Uri favoriteInsertUri = FavoriteDao.getInstance(getContext()).insertContentFavoriteMovie(favoriteValues);
 
         assertTrue(favoriteInsertUri != null);
 
@@ -117,6 +120,14 @@ public class TestProvider extends AndroidTestCase {
 
         utilities.validateCursor("testInsertReadProvider.  Error validating joined Favorite and Movie Data.",
                 favoriteCursor, favoriteValues);
+
+        int favCount = FavoriteDao.getInstance(getContext()).deleteFavorite(utilities.TEST_MOVIE_ID);
+
+        assertEquals("Error: Record not deleted from Favorite table during delete", 1, favCount);
+
+        int movieCount = MovieDao.getInstance(getContext()).deleteMovie(utilities.TEST_MOVIE_ID);
+
+        assertEquals("Error: Record not deleted from MovieDao table during delete", 1, movieCount);
 
     }
 

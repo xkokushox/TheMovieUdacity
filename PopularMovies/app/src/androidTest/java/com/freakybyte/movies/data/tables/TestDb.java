@@ -139,10 +139,10 @@ public class TestDb extends AndroidTestCase {
     public long insertMovie() {
         TestUtilities utils = new TestUtilities();
 
-        long movieRowId = MovieDao.getInstance(mContext).insertMovie(utils.mTestMovie);
+        long movieRowId = MovieDao.getInstance(mContext).insertMovieByContent(utils.createMovieValues());
 
         assertTrue("Error: Insert Movie in table", movieRowId != MovieDbHelper.FAIL_DB_MODIFY);
-        DBAdapter.getInstance(mContext).begginTransaction();
+        DBAdapter.getInstance(mContext).open();
         Cursor cursor = DBAdapter.getInstance(mContext).getData(MovieEntry.TABLE_NAME);
 
         // Move the cursor to a valid database row and check to see if we got any records back
@@ -156,7 +156,7 @@ public class TestDb extends AndroidTestCase {
                 cursor.moveToNext());
 
         cursor.close();
-        DBAdapter.getInstance(mContext).setTransactionSuccessful();
+        DBAdapter.getInstance(mContext).close();
         return movieRowId;
     }
 
@@ -173,7 +173,7 @@ public class TestDb extends AndroidTestCase {
 
         assertTrue("Error: Insert Favorite in table", favoriteRowId != MovieDbHelper.FAIL_DB_MODIFY);
 
-        DBAdapter.getInstance(mContext).begginTransaction();
+        DBAdapter.getInstance(mContext).open();
 
         Cursor cursor = DBAdapter.getInstance(mContext).getData(FavoriteEntry.TABLE_NAME);
 
@@ -185,7 +185,7 @@ public class TestDb extends AndroidTestCase {
         assertFalse("Error: More than one record returned from weather query", cursor.moveToNext());
 
         cursor.close();
-        DBAdapter.getInstance(mContext).setTransactionSuccessful();
+        DBAdapter.getInstance(mContext).close();
     }
 
 }
