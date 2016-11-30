@@ -18,29 +18,28 @@ public class MovieEntry extends MovieContract implements BaseColumns {
 
     public static final String TABLE_NAME = "movie_table";
 
-    public static final String COLUMN_MOVIE_ID = "id";
+    public static final String COLUMN_MOVIE_ID = "movie_id";
     public static final String COLUMN_POSTER_PATH = "poster_path";
-    public static final String COLUMN_ADULT = "adult";
     public static final String COLUMN_OVERVIEW = "overview";
     public static final String COLUMN_RELEASE_DATE = "release_date";
     public static final String COLUMN_ORIGINAL_TITLE = "original_title";
     public static final String COLUMN_TITLE = "title";
     public static final String COLUMN_BACKDROP_PATH = "backdrop_path";
     public static final String COLUMN_VOTE_AVERAGE = "vote_average";
+    public static final String COLUMN_VOTE_RUNTIME = "runtime";
 
     public static final String SQL_CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + " (" +
             _ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
 
             COLUMN_MOVIE_ID + " INTEGER NOT NULL, " +
             COLUMN_POSTER_PATH + "  TEXT NOT NULL, " +
-            COLUMN_POSTER_PATH + "  TEXT NOT NULL, " +
-            COLUMN_ADULT + " INTEGER NOT NULL, " +
             COLUMN_OVERVIEW + "  TEXT NOT NULL, " +
             COLUMN_RELEASE_DATE + "  TEXT NOT NULL, " +
             COLUMN_ORIGINAL_TITLE + "  TEXT NOT NULL, " +
             COLUMN_TITLE + "  TEXT NOT NULL, " +
             COLUMN_BACKDROP_PATH + "  TEXT NOT NULL, " +
-            COLUMN_VOTE_AVERAGE + " REAL NOT NULL " +
+            COLUMN_VOTE_AVERAGE + " REAL NOT NULL, " +
+            COLUMN_VOTE_RUNTIME + " INTEGER NOT NULL " +
             " );";
 
 
@@ -48,5 +47,8 @@ public class MovieEntry extends MovieContract implements BaseColumns {
         return ContentUris.withAppendedId(CONTENT_URI, id);
     }
 
+    public static long getMovieIdFromUri(Uri uri) {
+        return Long.parseLong(uri.getPathSegments().get(2));
+    }
 
 }

@@ -23,7 +23,9 @@ public class PopularEntry extends MovieContract implements BaseColumns {
     public static final String SQL_CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + " (" +
             _ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
 
-            COLUMN_MOVIE_ID + " INT UNIQUE NOT NULL);";
+            COLUMN_MOVIE_ID + " INT UNIQUE NOT NULL" +
+
+            ");";
 
 
     public static Uri buildPopularUri(long id) {

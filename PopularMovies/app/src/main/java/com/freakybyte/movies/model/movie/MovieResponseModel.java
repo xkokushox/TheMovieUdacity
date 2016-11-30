@@ -484,6 +484,18 @@ public class MovieResponseModel implements Parcelable {
     public MovieResponseModel() {
     }
 
+    public MovieResponseModel(String backdropPath, Integer id, String originalTitle, String overview, String title, String posterPath, String releaseDate, Integer runtime, float voteAverage) {
+        this.backdropPath = backdropPath;
+        this.id = id;
+        this.originalTitle = originalTitle;
+        this.overview = overview;
+        this.title = title;
+        this.posterPath = posterPath;
+        this.releaseDate = releaseDate;
+        this.runtime = runtime;
+        this.voteAverage = voteAverage;
+    }
+
     protected MovieResponseModel(Parcel in) {
         this.adult = (Boolean) in.readValue(Boolean.class.getClassLoader());
         this.backdropPath = in.readString();
