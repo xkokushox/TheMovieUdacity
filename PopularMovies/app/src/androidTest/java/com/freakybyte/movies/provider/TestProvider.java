@@ -180,4 +180,23 @@ public class TestProvider extends AndroidTestCase {
         }
         cursor.close();
     }
+
+    public void testMovieFavorite() {
+        deleteAllRecordsFromProvider();
+
+        boolean isFavorite = FavoriteDao.getInstance(getContext()).isMovieFavorite(TestUtilities.TEST_MOVIE_ID);
+
+        assertEquals("Error: Movie is Favorite", false, isFavorite);
+
+        FavoriteDao.getInstance(getContext()).insertFavoriteMovie(TestUtilities.mTestMovie);
+
+        isFavorite = FavoriteDao.getInstance(getContext()).isMovieFavorite(TestUtilities.TEST_MOVIE_ID);
+
+        assertEquals("Error: Movie is not Favorite", true, isFavorite);
+
+        int rowDeleted = FavoriteDao.getInstance(getContext()).deleteFavorite(TestUtilities.TEST_MOVIE_ID);
+
+        assertEquals("Error: Movie is Favorite", 1, rowDeleted);
+
+    }
 }
