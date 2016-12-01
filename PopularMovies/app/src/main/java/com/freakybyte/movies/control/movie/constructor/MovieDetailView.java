@@ -14,5 +14,7 @@ public interface MovieDetailView {
 
     void showLoader();
 
+    void refreshFavButton(boolean isFavorite);
+
     void closeLoaders();
 }

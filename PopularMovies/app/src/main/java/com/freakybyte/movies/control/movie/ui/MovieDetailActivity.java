@@ -10,7 +10,6 @@ import android.support.v4.widget.NestedScrollView;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
@@ -25,21 +24,20 @@ import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.facebook.imagepipeline.request.Postprocessor;
 import com.freakybyte.movies.R;
 import com.freakybyte.movies.control.BaseActivity;
-import com.freakybyte.movies.control.adapter.MoviesRecyclerViewAdapter;
 import com.freakybyte.movies.control.adapter.ReviewRecyclerViewAdapter;
 import com.freakybyte.movies.control.movie.constructor.MovieDetailPresenter;
 import com.freakybyte.movies.control.movie.constructor.MovieDetailView;
 import com.freakybyte.movies.control.movie.impl.MovieDetailPresenterImpl;
-import com.freakybyte.movies.model.ResultModel;
+import com.freakybyte.movies.data.dao.FavoriteDao;
 import com.freakybyte.movies.model.movie.MovieResponseModel;
 import com.freakybyte.movies.model.review.ReviewMovieModel;
-import com.freakybyte.movies.util.ConstantUtils;
 import com.freakybyte.movies.util.ImageUtils;
 
 import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class MovieDetailActivity extends BaseActivity implements MovieDetailView {
     public static final String TAG = "MovieDetailActivity";
@@ -66,12 +64,16 @@ public class MovieDetailActivity extends BaseActivity implements MovieDetailView
     public RecyclerView gridImages;
     @BindView(R.id.scroll_view_movie_detail)
     public NestedScrollView scrollViewMovieDetail;
+    @BindView(R.id.fb_movie_favorite)
+    public FloatingActionButton fbMovieFavorite;
 
     private LinearLayoutManager mLayoutManager;
     private ReviewRecyclerViewAdapter mAdapter;
 
     private MovieResponseModel mMovie;
     private MovieDetailPresenter mPresenter;
+
+    private FavoriteDao mFavoriteDao;
 
     private int iMoviePage = 1;
 
@@ -81,6 +83,7 @@ public class MovieDetailActivity extends BaseActivity implements MovieDetailView
         setContentView(R.layout.activity_movie_detail);
         ButterKnife.bind(this);
         mPresenter = new MovieDetailPresenterImpl(this, this);
+        mFavoriteDao = FavoriteDao.getInstance(this);
 
         setSupportActionBar(mToolbar);
 
@@ -106,12 +109,13 @@ public class MovieDetailActivity extends BaseActivity implements MovieDetailView
 
         if (savedInstanceState != null) {
             iMoviePage = savedInstanceState.getInt(TAG_REVIEW_PAGE, 0);
-            ArrayList<ReviewMovieModel> savedList = savedInstanceState.getParcelableArrayList(ResultModel.TAG);
+            ArrayList<ReviewMovieModel> savedList = savedInstanceState.getParcelableArrayList(MovieResponseModel.TAG);
             updateMovieReview(savedList);
         } else {
             mPresenter.getMovieReviews(mMovie.getId(), iMoviePage);
         }
 
+        refreshFavButton(mFavoriteDao.isMovieFavorite(mMovie.getId()));
 
         Log.d(TAG, "Movie:: " + mMovie.getId());
     }
@@ -136,7 +140,7 @@ public class MovieDetailActivity extends BaseActivity implements MovieDetailView
                             mCollapsingToolbar.setExpandedTitleColor(dominantSwatch.getTitleTextColor());
                         }
 
-                        updateBackground((FloatingActionButton) findViewById(R.id.fb_movie_favorite), palette);
+                        updateBackground(fbMovieFavorite, palette);
                         mCollapsingToolbar.setStatusBarScrimColor(palette.getDarkMutedColor(getResources().getColor(R.color.colorPrimary)));
                     }
                 });
@@ -178,13 +182,29 @@ public class MovieDetailActivity extends BaseActivity implements MovieDetailView
     }
 
     @Override
+    public void refreshFavButton(boolean isFavorite) {
+        fbMovieFavorite.setImageResource(isFavorite ? R.drawable.ic_favorite_selected : R.drawable.ic_favorite_no_selected);
+    }
+
+    @Override
     public void closeLoaders() {
 
     }
 
+    @OnClick(R.id.fb_movie_favorite)
+    public void setMovieFavorite() {
+        if (mFavoriteDao.isMovieFavorite(mMovie.getId())) {
+            mFavoriteDao.deleteFavorite(mMovie.getId());
+            refreshFavButton(false);
+        } else {
+            mFavoriteDao.insertFavoriteMovie(mMovie.getId());
+            refreshFavButton(true);
+        }
+    }
+
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
-        savedInstanceState.putParcelableArrayList(ResultModel.TAG, getMoviesAdapter().getReviews());
+        savedInstanceState.putParcelableArrayList(MovieResponseModel.TAG, getMoviesAdapter().getReviews());
         savedInstanceState.putInt(TAG_REVIEW_PAGE, iMoviePage);
         super.onSaveInstanceState(savedInstanceState);
     }

@@ -1,7 +1,6 @@
 package com.freakybyte.movies.control.adapter;
 
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.net.Uri;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
@@ -11,37 +10,37 @@ import android.view.ViewGroup;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.backends.pipeline.PipelineDraweeController;
-import com.facebook.drawee.controller.BaseControllerListener;
-import com.facebook.drawee.controller.ControllerListener;
-import com.facebook.imagepipeline.image.ImageInfo;
 import com.facebook.imagepipeline.request.BasePostprocessor;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.facebook.imagepipeline.request.Postprocessor;
 import com.freakybyte.movies.MoviesApplication;
 import com.freakybyte.movies.R;
+import com.freakybyte.movies.data.dao.FavoriteDao;
 import com.freakybyte.movies.listener.RecyclerViewListener;
-import com.freakybyte.movies.model.ResultModel;
+import com.freakybyte.movies.model.movie.MovieResponseModel;
 import com.freakybyte.movies.util.DebugUtils;
 import com.freakybyte.movies.util.ImageUtils;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Jose Torres on 20/10/2016.
  */
 
 public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesItemHolder> {
-    private ArrayList<ResultModel> aGallery;
+    private ArrayList<MovieResponseModel> aGallery;
     private RecyclerViewListener mListener;
     private boolean sendLastItemVisible;
     private int iListIndex;
+
+    private FavoriteDao mFavoriteDao;
 
     public MoviesRecyclerViewAdapter(RecyclerViewListener mListener) {
         this.aGallery = new ArrayList<>();
         this.mListener = mListener;
         iListIndex = 0;
+        mFavoriteDao = FavoriteDao.getInstance();
     }
 
     @Override
@@ -53,7 +52,7 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesItemHo
 
     @Override
     public void onBindViewHolder(final MoviesItemHolder viewHolder, int position) {
-        final ResultModel mImage = aGallery.get(position);
+        final MovieResponseModel mImage = aGallery.get(position);
 
         viewHolder.getTvMovieTitle().setText(mImage.getOriginalTitle());
 
@@ -64,6 +63,21 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesItemHo
             @Override
             public void onClick(View v) {
                 mListener.onItemClick(mImage);
+            }
+        });
+
+        viewHolder.getIbMovieFavorite().setImageResource(mFavoriteDao.isMovieFavorite(mImage.getId()) ? R.drawable.ic_favorite_selected : R.drawable.ic_favorite_no_selected);
+
+        viewHolder.getIbMovieFavorite().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mFavoriteDao.isMovieFavorite(mImage.getId())) {
+                    mFavoriteDao.deleteFavorite(mImage.getId());
+                    viewHolder.getIbMovieFavorite().setImageResource(R.drawable.ic_favorite_no_selected);
+                } else {
+                    mFavoriteDao.insertFavoriteMovie(mImage);
+                    viewHolder.getIbMovieFavorite().setImageResource(R.drawable.ic_favorite_selected);
+                }
             }
         });
 
@@ -115,13 +129,13 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesItemHo
         return this.aGallery.size();
     }
 
-    public void clearItems(ArrayList<ResultModel> aImages) {
+    public void clearItems(ArrayList<MovieResponseModel> aImages) {
         sendLastItemVisible = true;
         aGallery.clear();
         swapItems(aImages);
     }
 
-    public ArrayList<ResultModel> getMovieList() {
+    public ArrayList<MovieResponseModel> getMovieList() {
         return aGallery;
     }
 
@@ -129,7 +143,7 @@ public class MoviesRecyclerViewAdapter extends RecyclerView.Adapter<MoviesItemHo
         return iListIndex;
     }
 
-    public void swapItems(ArrayList<ResultModel> aImages) {
+    public void swapItems(ArrayList<MovieResponseModel> aImages) {
         sendLastItemVisible = true;
         aGallery.addAll(aImages);
         DebugUtils.logDebug("TotalItems:: ", aGallery.size());

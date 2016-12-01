@@ -6,5 +6,5 @@ package com.freakybyte.movies.util;
 
 public class ConstantUtils {
 
-    public enum movieFilter {POPULAR, NEW, TOP_RATED, UPCOMING}
+    public enum movieFilter {POPULAR, NEW, TOP_RATED, UPCOMING, FAVORITE}
 }

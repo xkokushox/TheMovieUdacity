@@ -18,6 +18,9 @@
             <item
                 android:id="@+id/menu_item_filter_top_rated"
                 android:title="@string/menu_item_top_rated"/>
+            <item
+                android:id="@+id/menu_item_filter_favorite"
+                android:title="@string/menu_item_top_favorite"/>
         </menu>
     </item>
 </menu>

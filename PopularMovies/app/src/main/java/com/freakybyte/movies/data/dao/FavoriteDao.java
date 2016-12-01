@@ -2,8 +2,10 @@ package com.freakybyte.movies.data.dao;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.net.Uri;
 
+import com.freakybyte.movies.MoviesApplication;
 import com.freakybyte.movies.data.DBAdapter;
 import com.freakybyte.movies.data.tables.FavoriteEntry;
 import com.freakybyte.movies.data.tables.MovieEntry;
@@ -37,6 +39,7 @@ public class FavoriteDao {
     }
 
     public FavoriteDao() {
+        this.mContext = MoviesApplication.getInstance();
     }
 
     public FavoriteDao(Context context) {
@@ -90,7 +93,8 @@ public class FavoriteDao {
         );
     }
 
-    public static int deleteFavorite(int idMovie) {
+    public int deleteFavorite(int idMovie) {
+        MovieDao.getInstance(mContext).deleteMovie(idMovie);
         String mSelectionClause = FavoriteEntry.COLUMN_MOVIE_KEY + " = ?";
         String[] mSelectionArgs = {String.valueOf(idMovie)};
         return mContext.getContentResolver().delete(
@@ -98,5 +102,42 @@ public class FavoriteDao {
                 mSelectionClause,
                 mSelectionArgs
         );
+    }
+
+    public boolean isMovieFavorite(int movieId) {
+        DBAdapter.getInstance(mContext).open();
+        boolean exist = false;
+        Cursor favoriteCursor = DBAdapter.getInstance(mContext).getData(FavoriteEntry.buildFavoriteUri(movieId));
+        if (favoriteCursor.moveToFirst())
+            exist = true;
+
+        favoriteCursor.close();
+        DBAdapter.getInstance(mContext).close();
+        return exist;
+    }
+
+
+    public ArrayList<MovieResponseModel> getAllMovies() {
+        DBAdapter.getInstance(mContext).beginTransaction();
+        ArrayList<MovieResponseModel> aMovies = new ArrayList<>();
+
+        Cursor cursor = mContext.getContentResolver().query(
+                FavoriteEntry.CONTENT_URI,
+                null, // leaving "columns" null just returns all the columns.
+                null, // cols for "where" clause
+                null, // values for "where" clause
+                FavoriteEntry._ID + " ASC"  // sort order == by DATE ASCENDING
+        );
+
+        cursor.moveToFirst();
+        for (int i = 0; i < cursor.getCount(); i++) {
+            aMovies.add(MovieDao.getInstance().getMovieByCursor(cursor));
+            cursor.moveToNext();
+        }
+
+        cursor.close();
+
+        DBAdapter.getInstance(mContext).setTransactionSuccessful();
+        return aMovies;
     }
 }

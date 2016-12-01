@@ -3,8 +3,10 @@ package com.freakybyte.movies.data.dao;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.net.Uri;
 
+import com.freakybyte.movies.MoviesApplication;
 import com.freakybyte.movies.data.DBAdapter;
 import com.freakybyte.movies.data.tables.FavoriteEntry;
 import com.freakybyte.movies.data.tables.MovieEntry;
@@ -38,6 +40,7 @@ public class MovieDao {
     }
 
     public MovieDao() {
+        this.mContext = MoviesApplication.getInstance();
     }
 
     public MovieDao(Context context) {
@@ -102,6 +105,63 @@ public class MovieDao {
                 mSelectionClause,
                 mSelectionArgs
         );
+    }
+
+    public MovieResponseModel getMovieByCursor(Cursor cursor) {
+        int _COLUMN_MOVIE_ID = cursor.getColumnIndex(MovieEntry.COLUMN_MOVIE_ID);
+        int _COLUMN_POSTER_PATH = cursor.getColumnIndex(MovieEntry.COLUMN_POSTER_PATH);
+        int _COLUMN_OVERVIEW = cursor.getColumnIndex(MovieEntry.COLUMN_OVERVIEW);
+        int _COLUMN_RELEASE_DATE = cursor.getColumnIndex(MovieEntry.COLUMN_RELEASE_DATE);
+        int _COLUMN_ORIGINAL_TITLE = cursor.getColumnIndex(MovieEntry.COLUMN_ORIGINAL_TITLE);
+        int _COLUMN_TITLE = cursor.getColumnIndex(MovieEntry.COLUMN_TITLE);
+        int _COLUMN_BACKDROP_PATH = cursor.getColumnIndex(MovieEntry.COLUMN_BACKDROP_PATH);
+        int _COLUMN_VOTE_AVERAGE = cursor.getColumnIndex(MovieEntry.COLUMN_VOTE_AVERAGE);
+        int _COLUMN_VOTE_RUNTIME = cursor.getColumnIndex(MovieEntry.COLUMN_VOTE_RUNTIME);
+
+        return new MovieResponseModel(cursor.getString(_COLUMN_BACKDROP_PATH), cursor.getInt(_COLUMN_MOVIE_ID),
+                cursor.getString(_COLUMN_ORIGINAL_TITLE), cursor.getString(_COLUMN_OVERVIEW),
+                cursor.getString(_COLUMN_TITLE), cursor.getString(_COLUMN_POSTER_PATH), cursor.getString(_COLUMN_RELEASE_DATE),
+                cursor.getInt(_COLUMN_VOTE_RUNTIME), cursor.getFloat(_COLUMN_VOTE_AVERAGE));
+    }
+
+    public MovieResponseModel getMovieById(int movieId) {
+        Cursor cursor = mContext.getContentResolver().query(
+                MovieEntry.buildMovieUri(movieId),
+                null, // leaving "columns" null just returns all the columns.
+                null, // cols for "where" clause
+                null, // values for "where" clause
+                MovieEntry._ID + " ASC"
+        );
+
+        if (!cursor.moveToFirst()) {
+            cursor.close();
+            return null;
+        }
+
+        MovieResponseModel mMovie = getMovieByCursor(cursor);
+
+        cursor.close();
+
+        return mMovie;
+    }
+
+    public ArrayList<MovieResponseModel> getAllMovies() {
+        ArrayList<MovieResponseModel> aMovies = new ArrayList<>();
+        Cursor cursor = DBAdapter.getInstance().getData(MovieEntry.CONTENT_URI);
+
+        if (!cursor.moveToFirst()) {
+            cursor.close();
+            return aMovies;
+        }
+        for (int i = 0; i < cursor.getCount(); i++) {
+            aMovies.add(getMovieByCursor(cursor));
+            cursor.moveToNext();
+        }
+
+
+        cursor.close();
+
+        return aMovies;
     }
 
 }

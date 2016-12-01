@@ -5,6 +5,7 @@ import android.os.Parcelable;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.freakybyte.movies.model.movie.MovieResponseModel;
 
 import java.util.ArrayList;
 
@@ -29,7 +30,7 @@ public class MoviesResponse implements Parcelable, Cloneable {
     @JsonProperty("page")
     private Integer page;
     @JsonProperty("results")
-    private ArrayList<ResultModel> results = new ArrayList<>();
+    private ArrayList<MovieResponseModel> results = new ArrayList<>();
     @JsonProperty("total_results")
     private Integer totalResults;
     @JsonProperty("total_pages")
@@ -49,7 +50,7 @@ public class MoviesResponse implements Parcelable, Cloneable {
         totalPages = in.readInt();
 
         results = new ArrayList<>();
-        results = in.readArrayList(ResultModel.class.getClassLoader());
+        results = in.readArrayList(MovieResponseModel.class.getClassLoader());
 
     }
 
@@ -81,7 +82,7 @@ public class MoviesResponse implements Parcelable, Cloneable {
      * @return The results
      */
     @JsonProperty("results")
-    public ArrayList<ResultModel> getResults() {
+    public ArrayList<MovieResponseModel> getResults() {
         return results;
     }
 
@@ -89,7 +90,7 @@ public class MoviesResponse implements Parcelable, Cloneable {
      * @param results The results
      */
     @JsonProperty("results")
-    public void setResults(ArrayList<ResultModel> results) {
+    public void setResults(ArrayList<MovieResponseModel> results) {
         this.results = results;
     }
 

@@ -324,7 +324,7 @@ public class MovieResponseModel implements Parcelable {
      */
     @JsonProperty("runtime")
     public Integer getRuntime() {
-        return runtime;
+        return runtime == null ? 0 : runtime;
     }
 
     /**
@@ -404,7 +404,7 @@ public class MovieResponseModel implements Parcelable {
      */
     @JsonProperty("video")
     public Boolean getVideo() {
-        return video;
+        return video == null ? false : video;
     }
 
     /**

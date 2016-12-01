@@ -16,7 +16,7 @@ import com.freakybyte.movies.control.movies.constructor.GridMoviesPresenter;
 import com.freakybyte.movies.control.movies.constructor.GridMoviesView;
 import com.freakybyte.movies.control.movies.impl.GridMoviesPresenterImpl;
 import com.freakybyte.movies.listener.RecyclerViewListener;
-import com.freakybyte.movies.model.ResultModel;
+import com.freakybyte.movies.model.movie.MovieResponseModel;
 import com.freakybyte.movies.util.ConstantUtils;
 import com.freakybyte.movies.util.DebugUtils;
 
@@ -72,7 +72,7 @@ public class GridMoviesActivity extends BaseActivity implements GridMoviesView, 
             iListIndex = savedInstanceState.getInt(TAG_LIST_INDEX, 0);
             mSubtitle = savedInstanceState.getString(TAG_SUBTITLE, "");
             mPresenter.setFilterType((ConstantUtils.movieFilter) savedInstanceState.getSerializable(TAG_FILTER_TYPE));
-            ArrayList<ResultModel> savedList = savedInstanceState.getParcelableArrayList(ResultModel.TAG);
+            ArrayList<MovieResponseModel> savedList = savedInstanceState.getParcelableArrayList(MovieResponseModel.TAG);
             updateGridMovies(savedList, mSubtitle);
         } else {
             mPresenter.getMovies(iMoviePage);
@@ -106,6 +106,10 @@ public class GridMoviesActivity extends BaseActivity implements GridMoviesView, 
                 mPresenter.setFilterType(ConstantUtils.movieFilter.UPCOMING);
                 onRefresh();
                 return true;
+            case R.id.menu_item_filter_favorite:
+                mPresenter.setFilterType(ConstantUtils.movieFilter.FAVORITE);
+                onRefresh();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -119,7 +123,7 @@ public class GridMoviesActivity extends BaseActivity implements GridMoviesView, 
 
     @Override
     public void onItemClick(Object object) {
-        ResultModel movie = (ResultModel) object;
+        MovieResponseModel movie = (MovieResponseModel) object;
         mPresenter.getMovieDetail(movie.getId());
         DebugUtils.logDebug(TAG, "Movie Selected:: " + movie.getTitle() + " Id:: " + movie.getId());
     }
@@ -137,7 +141,7 @@ public class GridMoviesActivity extends BaseActivity implements GridMoviesView, 
     }
 
     @Override
-    public void updateGridMovies(ArrayList<ResultModel> aGallery, String subtitle) {
+    public void updateGridMovies(ArrayList<MovieResponseModel> aGallery, String subtitle) {
         mSubtitle = subtitle;
         getSupportActionBar().setSubtitle(subtitle);
 
@@ -164,13 +168,17 @@ public class GridMoviesActivity extends BaseActivity implements GridMoviesView, 
 
     @Override
     public void closeLoaders() {
-        swipeContainer.setRefreshing(false);
-
+        swipeContainer.post(new Runnable() {
+            @Override
+            public void run() {
+                swipeContainer.setRefreshing(false);
+            }
+        });
     }
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
-        savedInstanceState.putParcelableArrayList(ResultModel.TAG, mAdapter.getMovieList());
+        savedInstanceState.putParcelableArrayList(MovieResponseModel.TAG, mAdapter.getMovieList());
         savedInstanceState.putInt(TAG_MOVIE_PAGE, iMoviePage);
         savedInstanceState.putInt(TAG_LIST_INDEX, mAdapter.getListIndex());
         savedInstanceState.putString(TAG_SUBTITLE, mSubtitle);

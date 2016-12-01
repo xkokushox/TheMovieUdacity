@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 
+import com.freakybyte.movies.MoviesApplication;
 import com.freakybyte.movies.util.DebugUtils;
 
 /**
@@ -37,6 +38,7 @@ public class DBAdapter {
     }
 
     public DBAdapter() {
+        this.mContext = MoviesApplication.getInstance();
     }
 
     public DBAdapter(Context context) {
@@ -54,12 +56,12 @@ public class DBAdapter {
         mDbHelper.close();
     }
 
-    private void beginTransaction() {
+    public void beginTransaction() {
         open();
         mDb.beginTransaction();
     }
 
-    private void setTransactionSuccessful() {
+    public void setTransactionSuccessful() {
         mDb.setTransactionSuccessful();
         mDb.endTransaction();
         close();

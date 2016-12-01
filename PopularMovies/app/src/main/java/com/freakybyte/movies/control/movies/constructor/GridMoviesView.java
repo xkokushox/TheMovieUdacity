@@ -1,6 +1,6 @@
 package com.freakybyte.movies.control.movies.constructor;
 
-import com.freakybyte.movies.model.ResultModel;
+import com.freakybyte.movies.model.movie.MovieResponseModel;
 
 import java.util.ArrayList;
 
@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 public interface GridMoviesView {
 
-    void updateGridMovies(ArrayList<ResultModel> aGallery, String subtitle);
+    void updateGridMovies(ArrayList<MovieResponseModel> aGallery, String subtitle);
 
     void showLoader();
 
