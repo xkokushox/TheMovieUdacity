@@ -1,4 +1,4 @@
-package com.freakybyte.movies.data.tables;
+package com.freakybyte.movies.data;
 
 import android.content.ContentValues;
 import android.database.ContentObserver;

@@ -1,7 +1,9 @@
-package com.freakybyte.movies.data.tables;
+package com.freakybyte.movies.data;
 
 import android.net.Uri;
 import android.test.AndroidTestCase;
+
+import com.freakybyte.movies.data.tables.MovieEntry;
 
 import org.junit.Test;
 

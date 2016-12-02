@@ -15,6 +15,7 @@
         android:id="@+id/appbar"
         android:layout_width="match_parent"
         android:layout_height="280dp"
+        android:background="@android:color/white"
         android:elevation="6dp"
         android:fitsSystemWindows="true"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
@@ -26,7 +27,8 @@
             android:elevation="6dp"
             android:fitsSystemWindows="true"
             app:collapsedTitleTextAppearance="@style/Toolbar.Collapsed.Title"
-            app:contentScrim="@color/white"
+            app:contentScrim="@color/colorPrimary"
+            app:expandedTitleTextAppearance="@style/Toolbar.Expanded.Title"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
             <RelativeLayout
@@ -44,8 +46,10 @@
                     android:fitsSystemWindows="true"
                     android:scaleType="fitStart"
                     fresco:actualImageScaleType="centerCrop"
-                    fresco:failureImageScaleType="centerCrop"/>
-
+                    fresco:failureImage="@drawable/popcorn_image_fail"
+                    fresco:failureImageScaleType="center"
+                    fresco:placeholderImage="@drawable/popcorn_image_fail"
+                    fresco:placeholderImageScaleType="center"/>
             </RelativeLayout>
 
 
@@ -79,7 +83,7 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
+                android:layout_height="220dp"
                 android:orientation="horizontal"
                 android:paddingBottom="8dp"
                 android:paddingTop="8dp"
@@ -101,7 +105,10 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         fresco:actualImageScaleType="centerCrop"
-                        fresco:failureImageScaleType="centerCrop"/>
+                        fresco:failureImage="@drawable/popcorn_image_fail"
+                        fresco:failureImageScaleType="center"
+                        fresco:placeholderImage="@drawable/popcorn_image_fail"
+                        fresco:placeholderImageScaleType="center"/>
                 </android.support.v7.widget.CardView>
 
                 <LinearLayout
@@ -127,7 +134,8 @@
                         android:text="120 min"
                         android:textColor="@color/secondaryText"
                         android:textSize="18sp"
-                        android:textStyle="normal"/>
+                        android:textStyle="normal"
+                        android:visibility="gone"/>
 
                     <TextView
                         android:id="@+id/tv_movie_rating"
@@ -135,7 +143,7 @@
                         android:layout_height="wrap_content"
                         android:text=".6/10"
                         android:textColor="@color/secondaryText"
-                        android:textSize="16sp"
+                        android:textSize="18sp"
                         android:textStyle="normal"/>
                 </LinearLayout>
 
@@ -151,9 +159,9 @@
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/conversation"
-                app:layout_behavior="@string/appbar_scrolling_view_behavior"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
 

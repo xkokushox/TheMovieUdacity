@@ -1,4 +1,4 @@
-package com.freakybyte.movies;
+package com.freakybyte.movies.provider;
 
 import android.content.UriMatcher;
 import android.net.Uri;
@@ -24,7 +24,7 @@ public class TestUriMatcher extends AndroidTestCase {
 
         assertEquals("Error: The MOVIE URI was matched incorrectly.",
                 testMatcher.match(TEST_MOVIE_DIR), MovieProvider.MOVIES);
-        assertEquals("Error: The LOCATION URI was matched incorrectly.",
+        assertEquals("Error: The FAVORITE URI was matched incorrectly.",
                 testMatcher.match(TEST_FAVORITE_DIR), MovieProvider.FAVORITES);
         assertEquals("Error: The MOVIE WITH ID URI was matched incorrectly.",
                 testMatcher.match(TEST_MOVIE_ID_DIR), MovieProvider.MOVIE_ID);

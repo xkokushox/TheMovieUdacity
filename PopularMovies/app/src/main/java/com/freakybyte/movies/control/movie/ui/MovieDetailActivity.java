@@ -11,6 +11,7 @@ import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
@@ -31,6 +32,7 @@ import com.freakybyte.movies.control.movie.impl.MovieDetailPresenterImpl;
 import com.freakybyte.movies.data.dao.FavoriteDao;
 import com.freakybyte.movies.model.movie.MovieResponseModel;
 import com.freakybyte.movies.model.review.ReviewMovieModel;
+import com.freakybyte.movies.util.DateTimeUtils;
 import com.freakybyte.movies.util.ImageUtils;
 
 import java.util.ArrayList;
@@ -90,7 +92,7 @@ public class MovieDetailActivity extends BaseActivity implements MovieDetailView
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        mToolbar.setNavigationIcon(getResources().getDrawable(R.drawable.ic_arrow_back));
+        mToolbar.setNavigationIcon(getResources().getDrawable(R.drawable.ic_arrow_back_black));
         mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -122,7 +124,8 @@ public class MovieDetailActivity extends BaseActivity implements MovieDetailView
 
     public void setToolbarContent() {
         mCollapsingToolbar.setTitle(mMovie.getTitle());
-        mCollapsingToolbar.setExpandedTitleColor(getResources().getColor(android.R.color.white));
+        mCollapsingToolbar.setExpandedTitleColor(getResources().getColor(android.R.color.black));
+        mCollapsingToolbar.setCollapsedTitleTextColor(getResources().getColor(android.R.color.white));
 
         final Postprocessor redMeshPostprocessor = new BasePostprocessor() {
 
@@ -135,6 +138,7 @@ public class MovieDetailActivity extends BaseActivity implements MovieDetailView
                         Palette.Swatch dominantSwatch = palette.getDominantSwatch();
 
                         if (dominantSwatch != null) {
+                            mToolbar.setNavigationIcon(getResources().getDrawable(R.drawable.ic_arrow_back));
                             mCollapsingToolbar.setContentScrimColor(dominantSwatch.getRgb());
                             mCollapsingToolbar.setCollapsedTitleTextColor(dominantSwatch.getTitleTextColor());
                             mCollapsingToolbar.setExpandedTitleColor(dominantSwatch.getTitleTextColor());
@@ -171,7 +175,7 @@ public class MovieDetailActivity extends BaseActivity implements MovieDetailView
 
     private void updateMovieContent() {
         tvMovieDescription.setText(mMovie.getOverview());
-        tvMovieDate.setText(mMovie.getReleaseDate());
+        tvMovieDate.setText(DateTimeUtils.getYearByDate(mMovie.getReleaseDate()));
         tvMovieDuration.setText(String.format(getResources().getString(R.string.detail_movie_duration), mMovie.getRuntime()));
         tvMovieRating.setText(String.format(getResources().getString(R.string.detail_movie_rating), mMovie.getVoteAverage()));
     }

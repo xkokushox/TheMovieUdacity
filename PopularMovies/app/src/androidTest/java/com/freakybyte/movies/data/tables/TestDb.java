@@ -7,6 +7,7 @@ import android.test.AndroidTestCase;
 
 import com.freakybyte.movies.data.DBAdapter;
 import com.freakybyte.movies.data.MovieDbHelper;
+import com.freakybyte.movies.data.TestUtilities;
 import com.freakybyte.movies.data.dao.FavoriteDao;
 import com.freakybyte.movies.data.dao.MovieDao;
 

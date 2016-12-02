@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:app="http://schemas.android.com/apk/res-auto"
               xmlns:card_view="http://schemas.android.com/apk/res-auto"
+              xmlns:fresco="http://schemas.android.com/apk/res-auto"
               xmlns:tools="http://schemas.android.com/tools"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
@@ -23,7 +24,13 @@
             <com.facebook.drawee.view.SimpleDraweeView
                 android:id="@+id/drawee_poster"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
+                android:layout_height="match_parent"
+                fresco:actualImageScaleType="centerCrop"
+                fresco:fadeDuration="0"
+                fresco:failureImage="@drawable/popcorn_image_fail"
+                fresco:failureImageScaleType="center"
+                fresco:placeholderImage="@drawable/popcorn_image_fail"
+                fresco:placeholderImageScaleType="center"/>
 
             <RelativeLayout
                 android:id="@+id/wrapper_movie_resume"

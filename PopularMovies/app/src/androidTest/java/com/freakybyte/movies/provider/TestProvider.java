@@ -7,11 +7,11 @@ import android.net.Uri;
 import android.test.AndroidTestCase;
 
 import com.freakybyte.movies.data.DBAdapter;
+import com.freakybyte.movies.data.TestUtilities;
 import com.freakybyte.movies.data.dao.FavoriteDao;
 import com.freakybyte.movies.data.dao.MovieDao;
 import com.freakybyte.movies.data.tables.FavoriteEntry;
 import com.freakybyte.movies.data.tables.MovieEntry;
-import com.freakybyte.movies.data.tables.TestUtilities;
 
 /**
  * Created by Jose Torres on 29/11/2016.
