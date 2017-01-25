@@ -15,6 +15,9 @@ import com.freakybyte.movies.util.DebugUtils;
 
 import java.util.ArrayList;
 
+import static com.freakybyte.movies.util.ConstantUtils.FAVORITE;
+import static com.freakybyte.movies.util.ConstantUtils.POPULAR;
+
 /**
  * Created by Jose Torres on 20/10/2016.
  */
@@ -26,13 +29,13 @@ public class GridMoviesPresenterImpl implements GridMoviesPresenter, OnRequestMo
     private GridMoviesInteractor mInteractor;
     private FragmentActivity mActivity;
 
-    private ConstantUtils.movieFilter mMovieFilter;
+    private @ConstantUtils.FilterMovie int mMovieFilter;
 
     public GridMoviesPresenterImpl(FragmentActivity activity, GridMoviesView view) {
         mView = view;
         mInteractor = new GridMoviesInteractorImpl();
         mActivity = activity;
-        mMovieFilter = ConstantUtils.movieFilter.POPULAR;
+        mMovieFilter = POPULAR;
     }
 
     @Override
@@ -40,7 +43,7 @@ public class GridMoviesPresenterImpl implements GridMoviesPresenter, OnRequestMo
         DebugUtils.logDebug(TAG, "GetItemsFromServer: Start  Page:: " + page);
         mView.showLoader();
 
-        switch (mMovieFilter) {
+        switch (getCurrentFilter()) {
             case FAVORITE:
                 mInteractor.getMoviesFromDB(this, page);
                 break;
@@ -51,12 +54,12 @@ public class GridMoviesPresenterImpl implements GridMoviesPresenter, OnRequestMo
     }
 
     @Override
-    public void setFilterType(ConstantUtils.movieFilter filter) {
+    public void setFilterType(int filter) {
         this.mMovieFilter = filter;
     }
 
     @Override
-    public ConstantUtils.movieFilter getFilterType() {
+    public int getFilterType() {
         return mMovieFilter;
     }
 
@@ -83,6 +86,11 @@ public class GridMoviesPresenterImpl implements GridMoviesPresenter, OnRequestMo
             }
         }, movieId);
 
+    }
+
+    @ConstantUtils.FilterMovie
+    public int getCurrentFilter() {
+        return mMovieFilter;
     }
 
     @Override

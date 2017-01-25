@@ -17,7 +17,6 @@ import com.freakybyte.movies.control.movies.constructor.GridMoviesView;
 import com.freakybyte.movies.control.movies.impl.GridMoviesPresenterImpl;
 import com.freakybyte.movies.listener.RecyclerViewListener;
 import com.freakybyte.movies.model.movie.MovieResponseModel;
-import com.freakybyte.movies.util.ConstantUtils;
 import com.freakybyte.movies.util.DebugUtils;
 
 import java.util.ArrayList;
@@ -25,6 +24,12 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+
+import static com.freakybyte.movies.util.ConstantUtils.FAVORITE;
+import static com.freakybyte.movies.util.ConstantUtils.NEW;
+import static com.freakybyte.movies.util.ConstantUtils.POPULAR;
+import static com.freakybyte.movies.util.ConstantUtils.TOP_RATED;
+import static com.freakybyte.movies.util.ConstantUtils.UPCOMING;
 
 public class GridMoviesActivity extends BaseActivity implements GridMoviesView, RecyclerViewListener, SwipeRefreshLayout.OnRefreshListener {
 
@@ -71,7 +76,7 @@ public class GridMoviesActivity extends BaseActivity implements GridMoviesView, 
             iMoviePage = savedInstanceState.getInt(TAG_MOVIE_PAGE, 0);
             iListIndex = savedInstanceState.getInt(TAG_LIST_INDEX, 0);
             mSubtitle = savedInstanceState.getString(TAG_SUBTITLE, "");
-            mPresenter.setFilterType((ConstantUtils.movieFilter) savedInstanceState.getSerializable(TAG_FILTER_TYPE));
+            mPresenter.setFilterType(savedInstanceState.getInt(TAG_FILTER_TYPE, 0));
             ArrayList<MovieResponseModel> savedList = savedInstanceState.getParcelableArrayList(MovieResponseModel.TAG);
             updateGridMovies(savedList, mSubtitle);
         } else {
@@ -91,23 +96,23 @@ public class GridMoviesActivity extends BaseActivity implements GridMoviesView, 
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_item_filter_new:
-                mPresenter.setFilterType(ConstantUtils.movieFilter.NEW);
+                mPresenter.setFilterType(NEW);
                 onRefresh();
                 return true;
             case R.id.menu_item_filter_popular:
-                mPresenter.setFilterType(ConstantUtils.movieFilter.POPULAR);
+                mPresenter.setFilterType(POPULAR);
                 onRefresh();
                 return true;
             case R.id.menu_item_filter_top_rated:
-                mPresenter.setFilterType(ConstantUtils.movieFilter.TOP_RATED);
+                mPresenter.setFilterType(TOP_RATED);
                 onRefresh();
                 return true;
             case R.id.menu_item_filter_upcoming:
-                mPresenter.setFilterType(ConstantUtils.movieFilter.UPCOMING);
+                mPresenter.setFilterType(UPCOMING);
                 onRefresh();
                 return true;
             case R.id.menu_item_filter_favorite:
-                mPresenter.setFilterType(ConstantUtils.movieFilter.FAVORITE);
+                mPresenter.setFilterType(FAVORITE);
                 onRefresh();
                 return true;
             default:

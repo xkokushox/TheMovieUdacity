@@ -9,7 +9,6 @@ import com.freakybyte.movies.data.dao.FavoriteDao;
 import com.freakybyte.movies.data.dao.MovieDao;
 import com.freakybyte.movies.model.MoviesResponse;
 import com.freakybyte.movies.model.movie.MovieResponseModel;
-import com.freakybyte.movies.util.ConstantUtils;
 import com.freakybyte.movies.util.DebugUtils;
 import com.freakybyte.movies.web.MoviesEndpointInterface;
 import com.freakybyte.movies.web.RetrofitBuilder;
@@ -20,6 +19,11 @@ import java.util.Map;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+import static com.freakybyte.movies.util.ConstantUtils.NEW;
+import static com.freakybyte.movies.util.ConstantUtils.POPULAR;
+import static com.freakybyte.movies.util.ConstantUtils.TOP_RATED;
+import static com.freakybyte.movies.util.ConstantUtils.UPCOMING;
 
 /**
  * Created by Jose Torres on 01/12/2016.
@@ -37,7 +41,7 @@ public class GridMoviesInteractorImpl implements GridMoviesInteractor {
     }
 
     @Override
-    public void getMoviesFromServer(final OnRequestMoviesListener listener, ConstantUtils.movieFilter filter, int page) {
+    public void getMoviesFromServer(final OnRequestMoviesListener listener, int filter, int page) {
         Call<MoviesResponse> callWebService;
         final String subtitle;
 
